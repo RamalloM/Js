@@ -1,3 +1,21 @@
 .carrito{
-    color: red;
+    color: black;
+    display: flex;
+    flex-direction: column;
+}
+
+.card{
+    display: flex;
+    align-items:start;
+    margin: 10px;
+}
+
+.lista{
+    display: flex;
+    flex-direction: row;
+
+}
+
+li{
+    margin-right: 100px;
 }

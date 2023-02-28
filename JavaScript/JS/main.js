@@ -1,30 +1,32 @@
 //Funcion constructora
-class Ingredientes {
-    constructor(producto, cantidad, unidad) {
-        this.producto = producto.toLowerCase();
+class Producto {
+    constructor(nombre, cantidad, unidad) {
+        this.nombre = nombre.toLowerCase();
         this.cantidad = cantidad;
         this.unidad = unidad;
     }
 }
 
-//Obetos nativos
-const fideos = new Ingredientes('fideos', '2', 'paq.');
-const cebolla = new Ingredientes('cebolla', '6', 'u.');
-
 //Array de objetos
-const stockDeProductos = [fideos, cebolla];
+const Stock = [];
 
+
+
+if(localStorage.getItem("Stock")){
+    Stock = JSON.parse(localStorage.getItem("Stock"));
+} 
+//DOM
 
 const primalContainer = document.getElementById("primalContainer");
-
 const div = document.createElement("div");
 
-    div.innerHTML =`
-    <div id="ingresoDeIngredientes>
+div.innerHTML = `
+    <div id="ingresoDeIngredientes">
+    <hr>
     <form id="formulario">
         <fieldset>
-        <label for="producto">Ingrese ingrediente aqui</label>
-        <input type="text" id="producto"></input>
+        <label for="nombre">Ingrese su producto aqui</label>
+        <input type="text" id="nombre"></input>
             <br>
         <label for="cantidad">Ingrese cantidad aqui</label>
         <input type="text" id="cantidad"></input>
@@ -32,48 +34,73 @@ const div = document.createElement("div");
         <label for="unidad">Ingrese la unidad de medida deseada</label>
         <input type="text" id="unidad"></input> 
             <br>
-        <button id="btnAdd"> Guardar ingrediente </button> 
+        <button id="btnAdd" class="btn btn-block btn-primary m-3"> Guardar ingrediente </button> 
     </fieldset>
     </form>
     </div>      
-                        
-    <div id="carrito">
-            <h2> Lista de Ingredientes </h2>
-    </div>
-
+    <hr>          
+    <div id="carrito">Lista de productos</div>
                     `;
 
 primalContainer.appendChild(div);
 
-const carrito = document.getElementById("carrito");
-carrito.className ="carrito";
 
+
+//formulario
 const formulario = document.getElementById("formulario");
 
 //modificar funcionIngresoDeIngredientes para que al hacer cick guarde el producto en carrito.
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
-    const producto = document.getElementById("producto");
+    const nombre = document.getElementById("nombre");
     const cantidad = document.getElementById("cantidad");
     const unidad = document.getElementById("unidad");
-    const productoIngresado = new Ingredientes(producto.value, cantidad.value, unidad.value);
-    stockDeProductos.push(productoIngresado);
-    console.log(stockDeProductos);
+    const productoIngresado = new Producto(nombre.value, cantidad.value, unidad.value);
+    Stock.push(productoIngresado);
     formulario.reset();
+    console.log(Stock);
+    localStorage.setItem("stock", JSON.stringify(Stock));
 }
 );
+//HASTA ACA FUNCIONA TODO BIEN 
+
+//carrito
+const carrito = document.getElementById("carrito");
+
+const mostrarStock = () => {
+    Stock.forEach(producto => {
+        const lista = document.createElement("div");
+        lista.innerHTML = `
+            <div>
+            <p>${producto.nombre}</p>
+            <p>${producto.cantidad}</p>
+            <p>${producto.unidad}</p>
+            <button id="trashBtn">Eliminar producto</button>
+            </div>
+                `;
+        carrito.appendChild(div);
+    }
+    )
+}
+
+//falta crear funcion
+const eliminarProducto = () =>{}
 
 
 
 
+const btnAdd = document.getElementById("btnAdd");
 
-//Comentarios
+btnAdd.addEventListener("click", () => {
+    Toastify({
+        text: "Tu producto ha sido agregado",
+        duration: 3000,
+        gravity: "top",
+        position: "rigth",
 
+    })
+})
 
-
-
-
-//Ingresar buscador de recetas 
 
 
 
@@ -115,7 +142,7 @@ formulario.addEventListener('submit', (e) => {
 
 
 
-// Funciones 
+// Funciones
 
 /* let flag = true; */
 
