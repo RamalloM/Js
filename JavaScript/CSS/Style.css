@@ -4,18 +4,16 @@
     flex-direction: column;
 }
 
-.card{
-    display: flex;
-    align-items:start;
-    margin: 10px;
-}
 
 .lista{
     display: flex;
     flex-direction: row;
-
+    display: inline;
+    
 }
 
-li{
-    margin-right: 100px;
+.secondaryTitle{
+    color: red;
+    margin: 10px;
+    
 }

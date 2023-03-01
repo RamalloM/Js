@@ -1,3 +1,17 @@
+/* IDEA COMPLETA:
+
+Base de datos en la que uno pueda almacenar, sumar y sustraer objetos.
+Base de datos en la que se puedan poner recetas, sumarlas, sutraer objetos.
+functiones que alerten de la falta de ingredientes.
+
+FALTA:
+eliminar carga de elementos vacios al carro
+funcion para eliminar objetos del carrito
+funcion para vaciar el carrito
+todo lo relacionado al "recetario" y sus funciones
+*/
+
+
 //Funcion constructora
 class Producto {
     constructor(nombre, cantidad, unidad) {
@@ -8,13 +22,8 @@ class Producto {
 }
 
 //Array de objetos
-const Stock = [];
+const Stock = JSON.parse(localStorage.getItem("stock")) || [];
 
-
-
-if(localStorage.getItem("Stock")){
-    Stock = JSON.parse(localStorage.getItem("Stock"));
-} 
 //DOM
 
 const primalContainer = document.getElementById("primalContainer");
@@ -24,27 +33,25 @@ div.innerHTML = `
     <div id="ingresoDeIngredientes">
     <hr>
     <form id="formulario">
-        <fieldset>
+    <fieldset   class="form-group">
         <label for="nombre">Ingrese su producto aqui</label>
-        <input type="text" id="nombre"></input>
+        <input type="text" id="nombre" class="form-control"></input>
             <br>
         <label for="cantidad">Ingrese cantidad aqui</label>
-        <input type="text" id="cantidad"></input>
+        <input type="text" id="cantidad" class="form-control"></input>
             <br>
         <label for="unidad">Ingrese la unidad de medida deseada</label>
-        <input type="text" id="unidad"></input> 
+        <input type="text" id="unidad" class="form-control"></input> 
             <br>
         <button id="btnAdd" class="btn btn-block btn-primary m-3"> Guardar ingrediente </button> 
     </fieldset>
     </form>
     </div>      
     <hr>          
-    <div id="carrito">Lista de productos</div>
+    <div id="carrito"></div>
                     `;
 
 primalContainer.appendChild(div);
-
-
 
 //formulario
 const formulario = document.getElementById("formulario");
@@ -60,34 +67,32 @@ formulario.addEventListener('submit', (e) => {
     formulario.reset();
     console.log(Stock);
     localStorage.setItem("stock", JSON.stringify(Stock));
+    mostrarStock();
 }
 );
-//HASTA ACA FUNCIONA TODO BIEN 
+
 
 //carrito
 const carrito = document.getElementById("carrito");
 
 const mostrarStock = () => {
+    carrito.innerHTML = `<h2 id:"secondaryTitle">Lista de Ingredientes</h2>`;
     Stock.forEach(producto => {
         const lista = document.createElement("div");
+        lista.className = "lista";
         lista.innerHTML = `
             <div>
-            <p>${producto.nombre}</p>
-            <p>${producto.cantidad}</p>
-            <p>${producto.unidad}</p>
-            <button id="trashBtn">Eliminar producto</button>
+                <p>${producto.nombre}</p>
+                <p>${producto.cantidad}</p>
+                <p>${producto.unidad}</p>
             </div>
+            <button id="${producto.nombre}" class="btn btn-block btn-secondary m-3">Eliminar producto</button>
                 `;
-        carrito.appendChild(div);
+        carrito.appendChild(lista);
+
     }
     )
 }
-
-//falta crear funcion
-const eliminarProducto = () =>{}
-
-
-
 
 const btnAdd = document.getElementById("btnAdd");
 
@@ -96,144 +101,12 @@ btnAdd.addEventListener("click", () => {
         text: "Tu producto ha sido agregado",
         duration: 3000,
         gravity: "top",
-        position: "rigth",
-
-    })
+        position: "right",
+    }).showToast();
 })
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-//Ejecucion del programa
-
-//programa();
-
-
-
-
-
-
-
-/* function decrementoDeIngredientes() {
-    let productoAEliminar = prompt('Indique el nombre del producto a eliminar');
-    // Anuncio: ustede posee x elementos, cuantos desea eliminar?
-    let cantidadAElimnar = parseInt(prompt("Ingrese cantidad a eliminar"));
-    let ingrediente = stockDeIngredientes.find(producto => producto.producto === productoAEliminar);
-    let indice = stockDeIngredientes.indexOf(ingrediente);
-
-    stockDeIngredientes.splice(indice, 1);
-    console.log(stockDeIngredientes);
-}
- */
-
-
-
-
-
-
-// Funciones
-
-/* let flag = true; */
-
-
-// Ingresar ingredientes CHECK!!
-/* function ingresoDeIngredientes() {
-    let producto = prompt('Ingrese el nombre del producto');
-    let cantidad = parseInt(prompt('Indique cantidad del producto a ingresar'));
-    let unidad = prompt("Ingrese una unidad del listado: gr, cc, u.");
-    let ingrediente = new Ingredientes(producto, cantidad, unidad);
-    stockDeIngredientes.push(ingrediente);
-    let condicion = prompt("¿Desea ingresar otro producto? \n Ingrese S para sí \n Ingrese N para no");
-    if (condicion === 'S' || condicion === "s") {
-        ingresoDeIngredientes();
-    }
-    else if (condicion === 'N' || condicion === "n") {
-        console.log(stockDeIngredientes);
-
-
-    }
-}
-
-
-// Egreso de ingredientes (Solo se puede eliminar un objeto.)
-function egresoDeIngredientes() {
-    let productoAEliminar = prompt('Indique el nombre del producto a eliminar');
-    let ingrediente = stockDeIngredientes.find(producto => producto.producto === productoAEliminar);
-    let indice = stockDeIngredientes.indexOf(ingrediente);
-    stockDeIngredientes.splice(indice, 1);
-    console.log(stockDeIngredientes);
-}
-
-
-
-// Falta funcion para decremetnear cantidad de objetos!!!!
-
-// Mostrar stock y terminar el programa CHECK
-function mostrarStock() {
-    console.log(stockDeIngredientes);
-}
-
-function salir() {
-    flag = false;
-    alert("Gracias por usar su Alacena Virtual");
-}
-
-
-//Funcion auxiliar para actualizar elementos.
-
-function inProgress() {
-    alert("Esta funcion aun no se encuentra disponible, lo sentimos")
-}
-
-
-// Declaracion de menu interactivo
-
-function programa() {
-    alert("Bienvenido a su Alacena Virtual");
-
-    while (flag) {
-        let opcionInicial = parseInt(prompt("Indique el numero de la lista para continuar: \n  1) Ingresar nuevo ingrediente \n 2) Stock total \n 3) Eliminar ingrediente \n 4) Recetario \n 5) Salir"));
-        switch (opcionInicial) {
-            case 1:
-                ingresoDeIngredientes();
-                break;
-            case 2:
-                mostrarStock();
-                break;
-            case 3:
-                egresoDeIngredientes();
-                break;
-            case 4:
-                inProgress();
-                break;
-            case 5:
-                salir();
-        }
-    }
-}
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+mostrarStock();

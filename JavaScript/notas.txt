@@ -1,8 +1,4 @@
-/* IDEA COMPLETA:
 
-Base de datos en la que uno pueda almacenar, sumar y sustraer objetos.
-Base de datos en la que se puedan poner recetas, sumarlas, sutraer objetos.
-functiones que alerten de la falta de ingredientes.
 
 
 
