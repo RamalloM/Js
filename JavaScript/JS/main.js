@@ -1,28 +1,16 @@
-/* IDEA COMPLETA:
-
-Base de datos en la que uno pueda almacenar, sumar y sustraer objetos.
-Base de datos en la que se puedan poner recetas, sumarlas, sutraer objetos.
-functiones que alerten de la falta de ingredientes.
-
-FALTA:
-eliminar carga de elementos vacios al carro
-funcion para eliminar objetos del carrito
-funcion para vaciar el carrito
-todo lo relacionado al "recetario" y sus funciones
-*/
-
 
 //Funcion constructora
 class Producto {
     constructor(nombre, cantidad, unidad) {
         this.nombre = nombre.toLowerCase();
-        this.cantidad = cantidad;
+        this.cantidad = parseFloat(cantidad);
         this.unidad = unidad;
     }
 }
 
 //Array de objetos
-const Stock = JSON.parse(localStorage.getItem("stock")) || [];
+let Stock = JSON.parse(localStorage.getItem("stock")) || [];
+
 
 //DOM
 
@@ -34,16 +22,16 @@ div.innerHTML = `
     <hr>
     <form id="formulario">
     <fieldset   class="form-group">
-        <label for="nombre">Ingrese su producto aqui</label>
-        <input type="text" id="nombre" class="form-control"></input>
+        <label for="nombre">Producto</label>
+        <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre del producto"></input>
             <br>
-        <label for="cantidad">Ingrese cantidad aqui</label>
-        <input type="text" id="cantidad" class="form-control"></input>
+        <label for="cantidad">Cantidad</label>
+        <input type="number" min="0" id="cantidad" class="form-control" placeholder="Ingrese un numero "></input>
             <br>
-        <label for="unidad">Ingrese la unidad de medida deseada</label>
-        <input type="text" id="unidad" class="form-control"></input> 
+        <label for="unidad">Unidad</label>
+        <input type="text" id="unidad" class="form-control" placeholder="Ingrese una unidad de medida"></input> 
             <br>
-        <button id="btnAdd" class="btn btn-block btn-primary m-3"> Guardar ingrediente </button> 
+        <button class="btn btn-block btn-primary m-3"> Guardar ingrediente </button> 
     </fieldset>
     </form>
     </div>      
@@ -56,57 +44,146 @@ primalContainer.appendChild(div);
 //formulario
 const formulario = document.getElementById("formulario");
 
-//modificar funcionIngresoDeIngredientes para que al hacer cick guarde el producto en carrito.
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
+
     const nombre = document.getElementById("nombre");
     const cantidad = document.getElementById("cantidad");
     const unidad = document.getElementById("unidad");
-    const productoIngresado = new Producto(nombre.value, cantidad.value, unidad.value);
-    Stock.push(productoIngresado);
+
+    if (!nombre.value || !cantidad.value || !unidad.value) {
+        toast("Complete todos los datos del formulario");
+        return;
+    }
+
+    const index = Stock.findIndex((producto) => producto.nombre === nombre.value.toLowerCase());
+
+    if (index === -1) {
+        agregarProducto(nombre.value, cantidad.value, unidad.value);
+        toast("Tu producto fue agregado con exito");
+    } else {
+        Stock[index].cantidad = parseInt(Stock[index].cantidad) + parseInt(cantidad.value);
+        toast("La cantidad de tu producto ha sido actualizada");
+    }
+
     formulario.reset();
-    console.log(Stock);
-    localStorage.setItem("stock", JSON.stringify(Stock));
+    guardarStock();
     mostrarStock();
 }
 );
 
+//Carrito
 
-//carrito
 const carrito = document.getElementById("carrito");
 
-const mostrarStock = () => {
-    carrito.innerHTML = `<h2 id:"secondaryTitle">Lista de Ingredientes</h2>`;
-    Stock.forEach(producto => {
-        const lista = document.createElement("div");
-        lista.className = "lista";
-        lista.innerHTML = `
-            <div>
-                <p>${producto.nombre}</p>
-                <p>${producto.cantidad}</p>
-                <p>${producto.unidad}</p>
-            </div>
-            <button id="${producto.nombre}" class="btn btn-block btn-secondary m-3">Eliminar producto</button>
-                `;
-        carrito.appendChild(lista);
 
+const crearProducto = (producto, index) => {
+    const lista = document.createElement("div");
+    lista.className = "lista";
+    lista.innerHTML = `
+      <ul>
+        <li>${producto.nombre}</li>
+        <li>${producto.cantidad}</li>
+        <li>${producto.unidad}</li>
+        <button id="btnAdd${index}">+</button>
+        <button id="btnSubstract${index}">-</button>
+      </ul>
+      <button id="btnDelete${index}" class="btn btn-block btn-secondary m-3">Eliminar producto</button>
+    `;
+
+    // Agregar eventos a los botones
+    const btnDelete = lista.querySelector(`#btnDelete${index}`);
+    btnDelete.addEventListener("click", () => eliminarProducto(index));
+
+    const btnAdd = lista.querySelector(`#btnAdd${index}`);
+    btnAdd.addEventListener("click", () => agregarCantidad(index, 1));
+
+    const btnSubstract = lista.querySelector(`#btnSubstract${index}`);
+    btnSubstract.addEventListener("click", () => restarCantidad(index, -1));
+
+    return lista;
+};
+
+// Función para eliminar un producto del stock
+const eliminarProducto = (index) => {
+    Stock.splice(index, 1);
+    toast("Tu producto ha sido eliminado");
+
+    localStorage.setItem("stock", JSON.stringify(Stock));
+    mostrarStock();
+};
+
+// Función para agregar cantidad a un producto del stock
+const agregarCantidad = (index, cantidad) => {
+    const producto = Stock[index];
+    !isNaN(cantidad) && (producto.cantidad++, localStorage.setItem("stock", JSON.stringify(Stock)), mostrarStock());
+}
+
+//Función para restar cantidad a un producto del stock
+const restarCantidad = (index, cantidad) => {
+    const producto = Stock[index];
+    const cantidadActual = parseInt(producto.cantidad);
+    (!isNaN(cantidad) && cantidadActual >= 1) &&
+        (producto.cantidad--,
+        localStorage.setItem("stock", JSON.stringify(Stock)),
+        mostrarStock())
+};
+//Funcion para vaciar el carrito
+const deleteChart = () => {
+    Swal.fire({
+        title: 'Alert',
+        text: 'Desea eliminar todo su inventario?',
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No',
+        reverseButtons: true,
+    }).then((result) => {
+        result.isConfirmed ? (Stock = [], localStorage.clear(), mostrarStock()) : result.dismiss;
     }
     )
 }
 
-const btnAdd = document.getElementById("btnAdd");
+// Función principal para mostrar la lista de productos
+const mostrarStock = () => {
+    carrito.innerHTML = `<h2 id="secondaryTitle">Lista de Ingredientes</h2>
+                            <button id="btnEmptyChart"> Eliminar Stock </button>`;
+    Stock.forEach((producto, index) => {
+        const lista = crearProducto(producto, index);
+        carrito.appendChild(lista);
+        //Boton vaciar carrito
+        const btnEmptyChart = carrito.querySelector(`#btnEmptyChart`);
+        btnEmptyChart.addEventListener("click", () => {
+            deleteChart();
+        })
+    });
+};
 
-btnAdd.addEventListener("click", () => {
-    Toastify({
-        text: "Tu producto ha sido agregado",
-        duration: 3000,
-        gravity: "top",
-        position: "right",
-    }).showToast();
-})
 
 
 
 
 
+//Funcion alerta con Toastify
+function toast(mensaje){
+Toastify({
+    text: mensaje,
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+}).showToast();
+}
+
+
+//funcion para agregar un producto a la lista
+function agregarProducto(nombre, cantidad, unidad){
+    const productoIngresado = new Producto (nombre, cantidad, unidad);
+    Stock.push(productoIngresado);
+}
+
+//funcion para actualizar el stock
+function guardarStock(){
+localStorage.setItem("stock", JSON.stringify(Stock));
+}
+//Ejecucion del programa
 mostrarStock();
