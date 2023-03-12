@@ -1,23 +1,38 @@
-.primalContainer{
+div.primalContainer {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 2px;
-}
-.carrito{
-    color: black;
-
 }
 
 
-.lista{
+
+.lista {
     display: flex;
     flex-direction: row;
     display: inline;
-    
+
 }
 
-.secondaryTitle{
+.secondaryTitle {
     color: red;
     margin: 10px;
-    
+
 }
+
+
+div.div1 {
+    display: flex;
+}
+
+body {
+    display: grid;
+}
+
+#ingresoDeIngredientes {
+    margin-top: 5rem;
+    padding-right: 10px;
+}
+
+#carrito {
+    margin-top: 5rem;
+    color: black;
+}
+

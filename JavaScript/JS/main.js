@@ -1,3 +1,6 @@
+//DESCRIPCION DEL PROGRAMA
+//Base de datos en la que se puedan almacenar productos a una lista o carrito, modificar sus cantidades y eliminarlos.
+
 
 //Funcion constructora
 class Producto {
@@ -11,15 +14,15 @@ class Producto {
 //Array de objetos
 let Stock = JSON.parse(localStorage.getItem("stock")) || [];
 
-
-//DOM
+//Formulario
 
 const primalContainer = document.getElementById("primalContainer");
 const div = document.createElement("div");
-
+div.className = "div1";
 div.innerHTML = `
-    <div id="ingresoDeIngredientes">
-    <hr>
+<hr>
+    <div id="ingresoDeIngredientes" class="col-6 ">
+    
     <form id="formulario">
     <fieldset   class="form-group">
         <label for="nombre">Producto</label>
@@ -36,12 +39,11 @@ div.innerHTML = `
     </form>
     </div>      
     <hr>          
-    <div id="carrito"></div>
+    <div id="carrito" class="col-6"></div>
                     `;
 
 primalContainer.appendChild(div);
 
-//formulario
 const formulario = document.getElementById("formulario");
 
 formulario.addEventListener('submit', (e) => {
@@ -72,6 +74,18 @@ formulario.addEventListener('submit', (e) => {
 }
 );
 
+//funcion para agregar un producto a la lista
+function agregarProducto(nombre, cantidad, unidad) {
+    const productoIngresado = new Producto(nombre, cantidad, unidad);
+    Stock.push(productoIngresado);
+}
+
+//funcion para actualizar el stock
+function guardarStock() {
+    localStorage.setItem("stock", JSON.stringify(Stock));
+}
+
+
 //Carrito
 
 const carrito = document.getElementById("carrito");
@@ -81,17 +95,20 @@ const crearProducto = (producto, index) => {
     const lista = document.createElement("div");
     lista.className = "lista";
     lista.innerHTML = `
-      <ul>
-        <li>${producto.nombre}</li>
-        <li>${producto.cantidad}</li>
-        <li>${producto.unidad}</li>
-        <button id="btnAdd${index}">+</button>
-        <button id="btnSubstract${index}">-</button>
+    <hr>
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">${producto.nombre}</li>
+        <li class="list-group-item">${producto.cantidad}</li>
+        <li class="list-group-item">${producto.unidad}</li>
       </ul>
+      <div class="btn-group">
+        <button id="btnAdd${index}" class="btn btn-primary">+</button>
+        <button id="btnSubstract${index}"  class="btn btn-primary">-</button>
+    </div>
       <button id="btnDelete${index}" class="btn btn-block btn-secondary m-3">Eliminar producto</button>
     `;
 
-    // Agregar eventos a los botones
+    // Eventos de los botones
     const btnDelete = lista.querySelector(`#btnDelete${index}`);
     btnDelete.addEventListener("click", () => eliminarProducto(index));
 
@@ -125,9 +142,10 @@ const restarCantidad = (index, cantidad) => {
     const cantidadActual = parseInt(producto.cantidad);
     (!isNaN(cantidad) && cantidadActual >= 1) &&
         (producto.cantidad--,
-        localStorage.setItem("stock", JSON.stringify(Stock)),
-        mostrarStock())
+            localStorage.setItem("stock", JSON.stringify(Stock)),
+            mostrarStock())
 };
+
 //Funcion para vaciar el carrito
 const deleteChart = () => {
     Swal.fire({
@@ -146,8 +164,8 @@ const deleteChart = () => {
 
 // Función principal para mostrar la lista de productos
 const mostrarStock = () => {
-    carrito.innerHTML = `<h2 id="secondaryTitle">Lista de Ingredientes</h2>
-                            <button id="btnEmptyChart"> Eliminar Stock </button>`;
+    carrito.innerHTML = `<h2 id="secondaryTitle" class="h4 text-center">Lista de Ingredientes</h2>
+                            <button id="btnEmptyChart" class ="btn btn-danger ml-auto"> Vaciar lista de ingredientes </button>`;
     Stock.forEach((producto, index) => {
         const lista = crearProducto(producto, index);
         carrito.appendChild(lista);
@@ -160,30 +178,15 @@ const mostrarStock = () => {
 };
 
 
-
-
-
-
 //Funcion alerta con Toastify
-function toast(mensaje){
-Toastify({
-    text: mensaje,
-    duration: 3000,
-    gravity: "top",
-    position: "right",
-}).showToast();
+function toast(mensaje) {
+    Toastify({
+        text: mensaje,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+    }).showToast();
 }
 
-
-//funcion para agregar un producto a la lista
-function agregarProducto(nombre, cantidad, unidad){
-    const productoIngresado = new Producto (nombre, cantidad, unidad);
-    Stock.push(productoIngresado);
-}
-
-//funcion para actualizar el stock
-function guardarStock(){
-localStorage.setItem("stock", JSON.stringify(Stock));
-}
 //Ejecucion del programa
 mostrarStock();
